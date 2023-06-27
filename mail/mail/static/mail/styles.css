@@ -1,3 +1,12 @@
 textarea {
     min-height: 400px;
 }
+
+.mailbox {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid black;
+    padding: 2px;
+}
