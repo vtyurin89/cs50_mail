@@ -84,4 +84,21 @@ function load_mailbox(mailbox) {
     });
 }
 
-//function load_letter()
+function load_letter(element_id) {
+    document.querySelector('#emails-view').style.display = 'block';
+    document.querySelector('#compose-view').style.display = 'none';
+    document.querySelector('#emails-view').innerHTML = "";
+
+    //load email
+    const route = `/emails/${element_id}`
+    fetch(route)
+    .then(response => response.json())
+    .then(email => {
+    // Print email
+    console.log(email);
+    const oneMail = document.createElement('div');
+    oneMail.innerHTML = `${email.subject}`
+
+    document.querySelector('#emails-view').append(oneMail);
+});
+}
