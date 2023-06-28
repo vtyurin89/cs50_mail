@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Use buttons to toggle between views
   document.querySelector('#inbox').addEventListener('click', () => load_mailbox('inbox'));
   document.querySelector('#sent').addEventListener('click', () => load_mailbox('sent'));
-  document.querySelector('#archived').addEventListener('click', () => load_mailbox('archive'));
+  document.querySelector('#archive').addEventListener('click', () => load_mailbox('archive'));
   document.querySelector('#compose').addEventListener('click', compose_email);
 
   // By default, load the inbox
@@ -17,7 +17,15 @@ function compose_email() {
   document.querySelector('#email-content').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'block';
 
-//  document.querySelector('#compose-send').addEventListener('click', send_email);
+  // Active nav link
+  const navLinks = document.querySelectorAll('nav a').forEach(link => {
+  if (link.id == 'compose') {
+    link.classList.add('active');
+  } else {
+    link.classList.remove('active');
+  }
+  })
+
 
     // send
       document.querySelector('#compose-form').onsubmit = () => {
@@ -59,12 +67,21 @@ function load_mailbox(mailbox) {
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
 
+  // Active nav link
+  const navLinks = document.querySelectorAll('nav a').forEach(link => {
+  if (link.id == mailbox) {
+    link.classList.add('active');
+  } else {
+    link.classList.remove('active');
+  }
+  })
+
+
   //show emails list
     const route = `/emails/${mailbox}`
     fetch(route)
     .then(response => response.json())
     .then(emails => {
-        console.log(emails);
 
     emails.forEach((element) => {
     const oneMail = document.createElement('div');
@@ -91,12 +108,14 @@ function load_letter(element_id) {
     document.querySelector('#compose-view').style.display = 'none';
 
     //load email
+    const myMail = document.getElementById('my-mail').innerHTML;
+    console.log(myMail);
+
     const route = `/emails/${element_id}`
     fetch(route)
     .then(response => response.json())
     .then(email => {
     // Print email
-    console.log(email);
     document.querySelector('#email-header').innerHTML = `${email.subject}`;
     document.querySelector('#email-sender').innerHTML = `${email.sender}`;
     document.querySelector('#email-recipients').innerHTML = `${email.recipients}`;
@@ -112,5 +131,25 @@ function load_letter(element_id) {
   })
 })
     }
+
+    //button visibility
+    if (email.sender != myMail) {
+        document.querySelector('#button-reply').style.display = 'inline-block';
+    if (email.archived) {
+    document.querySelector('#button-archive').style.display = 'none';
+    document.querySelector('#button-unarchive').style.display = 'inline-block';
+    } else {
+        document.querySelector('#button-unarchive').style.display = 'none';
+        document.querySelector('#button-archive').style.display = 'inline-block';
+    }
+    } else {
+        document.querySelector('#button-archive').style.display = 'none';
+        document.querySelector('#button-unarchive').style.display = 'none';
+        document.querySelector('#button-reply').style.display = 'none';
+    }
 });
+}
+
+function archive_letter(element_id) {
+    const arc_route = `/emails/${element_id}`;
 }
