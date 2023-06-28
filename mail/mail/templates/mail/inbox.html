@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block body %}
+    <h2>Mymail</h2>
     <h2>{{ request.user.email }}</h2>
 
     <button class="btn btn-sm btn-outline-primary" id="inbox">Inbox</button>
@@ -14,6 +15,22 @@
     <!-- emails -->
     <div id="emails-view">
     </div>
+
+    <!-- view email -->
+    <div id="email-content">
+        <h3 id="email-header"></h3>
+         <div class="d-flex flex-start mt-3">
+              <div class=""><span class="img-placeholder"></span></div>
+              <div class="ml-3 w-100">
+                <h6 class="fw-bold mb-1" id="email-sender"></h6>
+                <span class="text-secondary mb-1 mr-1">To:</span><span class="text-secondary mb-1" id="email-recipients"></span>
+                <p class="text-secondary mb-1 mr-1" id="email-timestamp"></p>
+                <hr>
+                <p class="mb-0" id="email-body">
+                </p>
+              </div>
+            </div>
+          </div>
 
     <!-- compose -->
     <div id="compose-view">

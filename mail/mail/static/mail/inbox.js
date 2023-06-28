@@ -14,6 +14,7 @@ function compose_email() {
 
   // Show compose view and hide other views
   document.querySelector('#emails-view').style.display = 'none';
+  document.querySelector('#email-content').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'block';
 
 //  document.querySelector('#compose-send').addEventListener('click', send_email);
@@ -52,6 +53,7 @@ function load_mailbox(mailbox) {
   
   // Show the mailbox and hide other views
   document.querySelector('#emails-view').style.display = 'block';
+  document.querySelector('#email-content').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'none';
 
   // Show the mailbox name
@@ -62,13 +64,12 @@ function load_mailbox(mailbox) {
     fetch(route)
     .then(response => response.json())
     .then(emails => {
-        // Print emails
         console.log(emails);
 
     emails.forEach((element) => {
     const oneMail = document.createElement('div');
     if (mailbox == 'sent') {
-        oneMail.innerHTML = `<div class="d-flex justify-content-between border p-1" onclick="load_letter(${element.id})" onmouseover="this.style.cursor='pointer';">
+        oneMail.innerHTML = `<div class="d-flex bg-light justify-content-between border p-1" onclick="load_letter(${element.id})" onmouseover="this.style.cursor='pointer';">
         <div>${element.recipients}</div><div>${element.subject}</div><div>${element.timestamp}</div><div>`;
     } else {
         if (element.read) {
@@ -85,9 +86,9 @@ function load_mailbox(mailbox) {
 }
 
 function load_letter(element_id) {
-    document.querySelector('#emails-view').style.display = 'block';
+    document.querySelector('#emails-view').style.display = 'none';
+    document.querySelector('#email-content').style.display = 'block';
     document.querySelector('#compose-view').style.display = 'none';
-    document.querySelector('#emails-view').innerHTML = "";
 
     //load email
     const route = `/emails/${element_id}`
@@ -96,9 +97,20 @@ function load_letter(element_id) {
     .then(email => {
     // Print email
     console.log(email);
-    const oneMail = document.createElement('div');
-    oneMail.innerHTML = `${email.subject}`
+    document.querySelector('#email-header').innerHTML = `${email.subject}`;
+    document.querySelector('#email-sender').innerHTML = `${email.sender}`;
+    document.querySelector('#email-recipients').innerHTML = `${email.recipients}`;
+    document.querySelector('#email-timestamp').innerHTML = `${email.timestamp}`;
+    document.querySelector('#email-body').innerHTML = `${email.body}`;
 
-    document.querySelector('#emails-view').append(oneMail);
+        //mark email as read
+    if (!email.read) {
+        fetch(route, {
+        method: 'PUT',
+        body: JSON.stringify({
+        read: true
+  })
+})
+    }
 });
 }

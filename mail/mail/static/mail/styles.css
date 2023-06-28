@@ -1,3 +1,16 @@
+body {
+    background-color: #f6f8fc;
+}
+
+main {
+    min-height: 100vh;
+    max-width: 1200px;
+    margin: auto;
+    background-color: #ffffff;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
 textarea {
     min-height: 400px;
 }
@@ -9,4 +22,16 @@ textarea {
     align-items: center;
     border: 1px solid black;
     padding: 2px;
+}
+
+.img-placeholder {
+  height: 40px;
+  width: 40px;
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+#email-header {
+    margin-left: 55px;
 }
