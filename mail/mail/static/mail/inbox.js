@@ -113,18 +113,32 @@ function load_letter(element_id) {
 
     //load email
     const myMail = document.getElementById('my-mail').innerHTML;
-
     const route = `/emails/${element_id}`
     fetch(route)
     .then(response => response.json())
-
     .then(email => {
     // Print email
-    document.querySelector('#email-header').innerHTML = `${email.subject}`;
-    document.querySelector('#email-sender').innerHTML = `${email.sender}`;
-    document.querySelector('#email-recipients').innerHTML = `${email.recipients}`;
-    document.querySelector('#email-timestamp').innerHTML = `${email.timestamp}`;
-    document.querySelector('#email-body').innerHTML = `${email.body}`;
+        document.querySelector('#email-content').innerHTML = `
+            <div class="d-flex justify-content-between">
+            <h3 class="mb-0" id="email-header">${email.subject}</h3>
+            <div>
+            <button class="btn btn-sm btn-outline-primary" id="button-archive" href="#">Archive</button>
+            <button class="btn btn-sm btn-outline-primary" id="button-unarchive" href="#">Unarchive</button>
+            <button class="btn btn-sm btn-outline-primary" id="button-reply" href="#">Reply</button>
+            </div>
+        </div>
+         <div class="d-flex flex-start mt-3">
+              <div class=""><span class="img-placeholder"></span></div>
+              <div class="ml-3 w-100">
+                <h6 class="fw-bold mb-1" id="email-sender">${email.sender}</h6>
+                <span class="text-secondary mb-1 mr-1">To:</span><span class="text-secondary mb-1" id="email-recipients">${email.recipients}</span>
+                <p class="text-secondary mb-1 mr-1" id="email-timestamp">${email.timestamp}</p>
+                <hr>
+                <p class="mb-0" id="email-body">${email.body}
+                </p>
+              </div>
+            </div>
+    `
 
         //mark email as read
     if (!email.read) {
