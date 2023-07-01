@@ -47,7 +47,8 @@ function compose_email() {
             console.log(result);
         });
         load_mailbox('sent');
-}
+        location.reload();
+        }
 
   // Clear out composition fields
   document.querySelector('#compose-recipients').value = '';
@@ -105,6 +106,7 @@ function load_mailbox(mailbox) {
 
 
 function load_letter(element_id) {
+
     document.querySelector('#emails-view').style.display = 'none';
     document.querySelector('#email-content').style.display = 'block';
     document.querySelector('#compose-view').style.display = 'none';
@@ -134,10 +136,28 @@ function load_letter(element_id) {
 })
     }
 
-    //button visibility
+    //button visibility and reply
     if (email.sender !== myMail) {
         document.querySelector('#button-reply').style.display = 'inline-block';
-        document.querySelector('#button-reply').addEventListener('click', () => reply_letter(email));
+        document.querySelector('#button-reply').addEventListener('click', function() {
+
+            compose_email();
+            console.log(email);
+            document.querySelector('#compose-recipients').value = `${email.sender}`;
+              document.querySelector('#compose-body').value = `
+
+---------------------------------------------
+On ${email.timestamp} ${email.sender} wrote:
+${email.body}
+`;
+        if (email.subject.startsWith('Re:')) {
+        document.querySelector('#compose-subject').value = `${email.subject}`;
+        } else {
+        document.querySelector('#compose-subject').value = `Re: ${email.subject}`;
+        }
+        document.querySelector('#compose-body').focus();
+        document.querySelector('#compose-body').setSelectionRange(0,0);
+        });
     if (email.archived) {
     document.querySelector('#button-archive').style.display = 'none';
     document.querySelector('#button-unarchive').style.display = 'inline-block';
@@ -182,56 +202,4 @@ function unarchive_letter(element_id) {
 
     load_mailbox('inbox');
     location.reload();
-}
-
-
-function reply_letter(email) {
-    // Show compose view and hide other views
-  document.querySelector('#emails-view').style.display = 'none';
-  document.querySelector('#email-content').style.display = 'none';
-  document.querySelector('#compose-view').style.display = 'block';
-
-    // Active nav link
-  const navLinks = document.querySelectorAll('nav a').forEach(link => {
-  if (link.id == 'compose') {
-    link.classList.add('active');
-  } else {
-    link.classList.remove('active');
-  }
-  })
-
-         // Set up composition fields
-  console.log(email);
-  document.querySelector('#compose-recipients').value = `${email.sender}`;
-  document.querySelector('#compose-body').value = `
-  On ${email.timestamp} ${email.sender} wrote:
-  ${email.body}
-  `;
-  if (email.subject.startsWith('Re:')) {
-    document.querySelector('#compose-subject').value = `${email.subject}`;
-  } else {
-  document.querySelector('#compose-subject').value = `Re: ${email.subject}`;
-  }
-
-        // send
-      document.querySelector('#compose-form').onsubmit = () => {
-      const composeRecipients = document.querySelector('#compose-recipients').value;
-      const composeSubject = document.querySelector('#compose-subject').value;
-      const composeBody = document.querySelector('#compose-body').value;
-
-        fetch('/emails', {
-          method: 'POST',
-          body: JSON.stringify({
-              recipients: composeRecipients,
-              subject: composeSubject,
-              body: composeBody,
-          })
-        })
-        .then(response => response.json())
-        .then(result => {
-            // Print result
-            console.log(result);
-        });
-        load_mailbox('sent');
-}
 }
