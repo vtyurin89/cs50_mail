@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
   load_mailbox('inbox');
 });
 
+
 function compose_email() {
 
   // Show compose view and hide other views
@@ -25,7 +26,6 @@ function compose_email() {
     link.classList.remove('active');
   }
   })
-
 
     // send
       document.querySelector('#compose-form').onsubmit = () => {
@@ -64,6 +64,7 @@ function load_mailbox(mailbox) {
   document.querySelector('#email-content').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'none';
 
+
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
 
@@ -86,14 +87,14 @@ function load_mailbox(mailbox) {
     emails.forEach((element) => {
     const oneMail = document.createElement('div');
     if (mailbox == 'sent') {
-        oneMail.innerHTML = `<div class="d-flex bg-light justify-content-between border p-1" onclick="load_letter(${element.id})" onmouseover="this.style.cursor='pointer';">
+        oneMail.innerHTML = `<div class="d-flex bg-light justify-content-between border p-1 rounded" onclick="load_letter(${element.id})" onmouseover="this.style.cursor='pointer';">
         <div>${element.recipients}</div><div>${element.subject}</div><div>${element.timestamp}</div><div>`;
     } else {
         if (element.read) {
-            oneMail.innerHTML = `<div class="d-flex bg-light justify-content-between border p-1" onclick="load_letter(${element.id})" onmouseover="this.style.cursor='pointer';">
+            oneMail.innerHTML = `<div class="d-flex bg-light justify-content-between border p-1 rounded" onclick="load_letter(${element.id})" onmouseover="this.style.cursor='pointer';">
             <div>${element.sender}</div><div>${element.subject}</div><div>${element.timestamp}</div><div>`;
         } else {
-        oneMail.innerHTML = `<div class="d-flex bg-secondary text-white justify-content-between border p-1" onclick="load_letter(${element.id})" onmouseover="this.style.cursor='pointer';">
+        oneMail.innerHTML = `<div class="d-flex bg-secondary text-white justify-content-between border p-1 rounded" onclick="load_letter(${element.id})" onmouseover="this.style.cursor='pointer';">
         <div>${element.sender}</div><div>${element.subject}</div><div>${element.timestamp}</div><div>`;
         }
     }
@@ -102,6 +103,7 @@ function load_mailbox(mailbox) {
     });
 }
 
+
 function load_letter(element_id) {
     document.querySelector('#emails-view').style.display = 'none';
     document.querySelector('#email-content').style.display = 'block';
@@ -109,11 +111,11 @@ function load_letter(element_id) {
 
     //load email
     const myMail = document.getElementById('my-mail').innerHTML;
-    console.log(myMail);
 
     const route = `/emails/${element_id}`
     fetch(route)
     .then(response => response.json())
+
     .then(email => {
     // Print email
     document.querySelector('#email-header').innerHTML = `${email.subject}`;
@@ -133,14 +135,17 @@ function load_letter(element_id) {
     }
 
     //button visibility
-    if (email.sender != myMail) {
+    if (email.sender !== myMail) {
         document.querySelector('#button-reply').style.display = 'inline-block';
+        document.querySelector('#button-reply').addEventListener('click', () => reply_letter(email));
     if (email.archived) {
     document.querySelector('#button-archive').style.display = 'none';
     document.querySelector('#button-unarchive').style.display = 'inline-block';
+    document.querySelector('#button-unarchive').addEventListener('click', () => unarchive_letter(element_id));
     } else {
         document.querySelector('#button-unarchive').style.display = 'none';
         document.querySelector('#button-archive').style.display = 'inline-block';
+        document.querySelector('#button-archive').addEventListener('click', () => archive_letter(element_id));
     }
     } else {
         document.querySelector('#button-archive').style.display = 'none';
@@ -150,6 +155,83 @@ function load_letter(element_id) {
 });
 }
 
+
+    //archive letter
 function archive_letter(element_id) {
     const arc_route = `/emails/${element_id}`;
+    fetch(arc_route, {
+    method: 'PUT',
+    body: JSON.stringify({
+      archived: true
+    })
+    })
+
+    load_mailbox('inbox');
+    location.reload();
+}
+
+
+function unarchive_letter(element_id) {
+    const arc_route = `/emails/${element_id}`;
+    fetch(arc_route, {
+    method: 'PUT',
+    body: JSON.stringify({
+      archived: false
+    })
+    })
+
+    load_mailbox('inbox');
+    location.reload();
+}
+
+
+function reply_letter(email) {
+    // Show compose view and hide other views
+  document.querySelector('#emails-view').style.display = 'none';
+  document.querySelector('#email-content').style.display = 'none';
+  document.querySelector('#compose-view').style.display = 'block';
+
+    // Active nav link
+  const navLinks = document.querySelectorAll('nav a').forEach(link => {
+  if (link.id == 'compose') {
+    link.classList.add('active');
+  } else {
+    link.classList.remove('active');
+  }
+  })
+
+         // Set up composition fields
+  console.log(email);
+  document.querySelector('#compose-recipients').value = `${email.sender}`;
+  document.querySelector('#compose-body').value = `
+  On ${email.timestamp} ${email.sender} wrote:
+  ${email.body}
+  `;
+  if (email.subject.startsWith('Re:')) {
+    document.querySelector('#compose-subject').value = `${email.subject}`;
+  } else {
+  document.querySelector('#compose-subject').value = `Re: ${email.subject}`;
+  }
+
+        // send
+      document.querySelector('#compose-form').onsubmit = () => {
+      const composeRecipients = document.querySelector('#compose-recipients').value;
+      const composeSubject = document.querySelector('#compose-subject').value;
+      const composeBody = document.querySelector('#compose-body').value;
+
+        fetch('/emails', {
+          method: 'POST',
+          body: JSON.stringify({
+              recipients: composeRecipients,
+              subject: composeSubject,
+              body: composeBody,
+          })
+        })
+        .then(response => response.json())
+        .then(result => {
+            // Print result
+            console.log(result);
+        });
+        load_mailbox('sent');
+}
 }

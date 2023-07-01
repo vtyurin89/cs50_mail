@@ -2,12 +2,19 @@
 {% load static %}
 
 {% block body %}
-    <div class="container">
-    <h2>Mymail</h2>
-    <h2 id="my-mail">{{ request.user.email }}</h2>
+    <nav class="navbar navbar-light pt-3 pb-3">
+    <h2 class="ml-3">Mymail</h2>
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false" >
+            <span id="my-mail">{{ request.user.email }}</span>
+        </button>
+        <div class="dropdown-menu">
+        <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+        </div>
+    </div>
+    </nav>
 
-    <a class="btn btn-sm btn-outline-primary" href="{% url 'logout' %}">Log Out</a>
-    <hr>
+    <hr class="mt-0">
     </div>
 
     <div class="container" style="min-height: 75vh;">
