@@ -47,7 +47,7 @@ function compose_email() {
             console.log(result);
         });
         load_mailbox('sent');
-        location.reload();
+
         }
 
   // Clear out composition fields
