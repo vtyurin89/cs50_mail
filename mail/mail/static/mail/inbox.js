@@ -134,7 +134,7 @@ function load_letter(element_id) {
                 <span class="text-secondary mb-1 mr-1">To:</span><span class="text-secondary mb-1" id="email-recipients">${email.recipients}</span>
                 <p class="text-secondary mb-1 mr-1" id="email-timestamp">${email.timestamp}</p>
                 <hr>
-                <p class="mb-0" id="email-body">${email.body}
+                <p class="mb-0" id="email-body" style="white-space: pre-wrap">${email.body}
                 </p>
               </div>
             </div>
